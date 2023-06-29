@@ -96,7 +96,7 @@ class UrlShortenerListFragment :
             buttonSendUrl.isVisible = !progressBarVisible
             originalUrlEditText.isVisible = !progressBarVisible
             urlshortenerListTitle.isVisible = !progressBarVisible
-            binding.urlshortenerScrollView.isVisible = !progressBarVisible
+            urlshortenerList.isVisible = !progressBarVisible
         }
     }
 

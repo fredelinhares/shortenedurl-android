@@ -23,12 +23,6 @@ import org.junit.Test
 
 class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
 
-    // ATENÇÃO: Esse delay não é necessário! Só foi utilizado para que vocês possam avaliar em tempo de
-    // teste de UI que o app está funcional, uma vez que a API não está funcionando.
-    private fun delay(timeDelay:Long){
-        Thread.sleep(timeDelay)
-    }
-
     @Test
     fun given_UrlShortenerListFragment_WHEN_startFragment_THEN_validate_initial_views_state() {
         // GIVEN
@@ -43,28 +37,20 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
         onView(withId(R.id.button_send_url)).check(matches(isNotEnabled()))
         // AND: empty edittext field
         onView(withId(R.id.original_url_edit_text)).check(matches(isDisplayed())).check(matches(withText("")))
-        // AND: url list empty (recyclerView) no visible
-        onView(withId(R.id.urlshortener_list)).check(matches(not(isDisplayed())))
         // AND: recyclerView with zero elements
         onView(withId(R.id.urlshortener_list)).check(RecyclerViewItemCountAssertion(0))
-
-        delay(3000)
     }
 
     @Test
-    fun given_UrlShortenerListFragment_initial_views_state_WHEN_buttonSendUrl_clicked_THEN_urlshortener_list_not_displayed_an_with_empty_list() {
+    fun given_UrlShortenerListFragment_initial_views_state_WHEN_buttonSendUrl_clicked_THEN_urlshortener_list_with_empty_list() {
         // GIVEN
         startFragment { UrlShortenerListFragment() }
 
         // WHEN
         onView(withId(R.id.button_send_url)).perform(click())
 
-        // THEN: url list no visible
-        onView(withId(R.id.urlshortener_list)).check(matches(not(isDisplayed())))
-        // AND: recyclerView with zero elements
+        // THEN: recyclerView with zero elements
         onView(withId(R.id.urlshortener_list)).check(RecyclerViewItemCountAssertion(0))
-
-        delay(3000)
     }
 
     @Test
@@ -81,23 +67,18 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
         )
         coEvery { urlShortenerRemoteRepository.registerUrl(originalUrl) } returns shortenedUrl
 
-        delay(1000)
-
         startFragment { UrlShortenerListFragment() }
 
         val typedUrl = "https://sou.nu"
         onView(withId(R.id.original_url_edit_text)).perform(replaceText(typedUrl))
 
-        delay(1000)
-
         // WHEN
         onView(withId(R.id.button_send_url)).perform(click())
 
-        delay(1000)
-
         // THEN
-        onView(withId(R.id.urlshortener_scroll_view)).check(matches(isDisplayed()))
-        onView(withId(R.id.urlshortener_list)).check(RecyclerViewItemCountAssertion(1))
+        onView(withId(R.id.urlshortener_list))
+            .check(matches(isDisplayed()))
+            .check(RecyclerViewItemCountAssertion(1))
         onView(
             withRecyclerView(R.id.urlshortener_list).atPositionOnView(0, R.id.original_url, R.id.title_item)
         ).check(matches(withText("URL"))).check(matches(isDisplayed()))
@@ -110,8 +91,6 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
         onView(
             withRecyclerView(R.id.urlshortener_list).atPositionOnView(0, R.id.shortened_url, R.id.content_item)
         ).check(matches(withText("https://url-shortener-nu.herokuapp.com/short/73563"))).check(matches(isDisplayed()))
-
-        delay(3000)
     }
 
     @Test
@@ -130,24 +109,18 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
 
         startFragment { UrlShortenerListFragment() }
 
-        delay(1000)
-
         val typedUrl = "https://sou.nu"
         onView(withId(R.id.original_url_edit_text)).perform(replaceText(typedUrl))
 
         // WHEN: double click performed
-        delay(1000)
-
         onView(withId(R.id.button_send_url)).perform(click())
-
-        delay(3000)
-
         onView(withId(R.id.button_send_url)).perform(click())
 
         // THEN: list is displayed
-        onView(withId(R.id.urlshortener_scroll_view)).check(matches(isDisplayed()))
         // AND: validate that a new element was not added to the list with the same content
-        onView(withId(R.id.urlshortener_list)).check(RecyclerViewItemCountAssertion(1))
+        onView(withId(R.id.urlshortener_list))
+            .check(matches(isDisplayed()))
+            .check(RecyclerViewItemCountAssertion(1))
         onView(
             withRecyclerView(R.id.urlshortener_list).atPositionOnView(0, R.id.original_url, R.id.title_item)
         ).check(matches(withText("URL"))).check(matches(isDisplayed()))
@@ -160,8 +133,6 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
         onView(
             withRecyclerView(R.id.urlshortener_list).atPositionOnView(0, R.id.shortened_url, R.id.content_item)
         ).check(matches(withText("https://url-shortener-nu.herokuapp.com/short/73563"))).check(matches(isDisplayed()))
-
-        delay(3000)
     }
 
     @Test
@@ -180,13 +151,10 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
 
         startFragment { UrlShortenerListFragment() }
 
-        delay(1000)
-
         // AND: first link typed: https://sou.nu
         var typedUrl = "https://sou.nu"
         onView(withId(R.id.original_url_edit_text)).perform(replaceText(typedUrl))
 
-        delay(1000)
         // AND: first link sent
         onView(withId(R.id.button_send_url)).perform(click())
 
@@ -202,19 +170,18 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
         )
         coEvery { urlShortenerRemoteRepository.registerUrl(originalUrl) } returns shortenedUrl
 
-        delay(2000)
         // AND: second link typed: https://sou.nu
         typedUrl = "https://nubank.com.br"
         onView(withId(R.id.original_url_edit_text)).perform(replaceText(typedUrl))
         // AND: second link sent
         onView(withId(R.id.button_send_url)).perform(click())
 
-        delay(2000)
         // WHEN: validate screen content
         // THEN: validate list diplayed in screen
-        onView(withId(R.id.urlshortener_scroll_view)).check(matches(isDisplayed()))
         // AND: number of list elements are equal of different links sent
-        onView(withId(R.id.urlshortener_list)).check(RecyclerViewItemCountAssertion(2))
+        onView(withId(R.id.urlshortener_list))
+            .check(matches(isDisplayed()))
+            .check(RecyclerViewItemCountAssertion(2))
         // AND: the first item on the list was the last to be sent
         onView(
             withRecyclerView(R.id.urlshortener_list).atPositionOnView(0, R.id.original_url, R.id.title_item)
@@ -241,8 +208,6 @@ class UrlShortenerListFragmentTest : BaseInstrumentedTest() {
         onView(
             withRecyclerView(R.id.urlshortener_list).atPositionOnView(1, R.id.shortened_url, R.id.content_item)
         ).check(matches(withText("https://url-shortener-nu.herokuapp.com/short/73563"))).check(matches(isDisplayed()))
-
-        delay(2000)
     }
 }
 
